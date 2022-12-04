@@ -47,8 +47,8 @@ while True:
             for i, lm in enumerate(handLms.landmark):
                 # print(id, lm)
 
-                cx, cy = int(lm.x * w), int(lm.y * h)
                 if i==8:
+                    cx, cy = int(lm.x * w), int(lm.y * h)
                     ct = time.time()-hand_init_time
                     print(cx, cy, ct)
 
