@@ -2,10 +2,9 @@
 
 This project tries to capture multiple strokes drawn by the index fingertip movement from a webcam without any extra device being used.
 It traces and predicts the object drawn. Please install the following dependencies to get started -
-
+`
 absl-py==1.3.0
 attrs==22.1.0
-certifi @ file:///C:/b/abs_ac29jvt43w/croot/certifi_1665076682579/work/certifi
 contourpy==1.0.6
 cycler==0.11.0
 flatbuffers==22.11.23
@@ -23,3 +22,4 @@ pyparsing==3.0.9
 python-dateutil==2.8.2
 six==1.16.0
 wincertstore==0.2
+`
