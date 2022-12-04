@@ -90,7 +90,7 @@ if __name__ == '__main__':
                                 print("stroke_count:", stroke_count)
                                 if stroke_count>1 and len(strokes[stroke_count-1])==1:
                                     stroke_count -= 1
-                                    print("Removed the last stroke as the last stroke had only one points")
+                                    print("Removed the last stroke as the last stroke had only one point")
                                     print("stroke_count:", stroke_count)
                                 strokes[stroke_count] = []
                             
@@ -105,9 +105,7 @@ if __name__ == '__main__':
             # print("strokes:", strokes)
         else:
             if len(strokes)!=0:
-                print("Hand is out of drawing area!!!")
-                new_stroke_flag = False
-            
+                print("Hand is out of drawing area!!!")            
             draw_points(index_points)
 
         # cTime = time.time()
