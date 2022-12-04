@@ -14,11 +14,12 @@ def draw_points(index_points):
 def createStrokes(index_points, cx, cy, ct):
     if len(index_points)>init_index_points_count:
         """
-        Checks only after 15 index points are captured (Approx for a sec)
-        Tries to find the time which was almost 1 sec prior to the current time
-        If such a time is found, then finds the average of all the x and y coordinates during
-        the last second and checks if the hand was actually stationary. 
-        If the hand has not moved in the last second, then a new stroke is created
+        1. Checks for the first time only after 15 index points are captured (Approx for a sec) and then for every input
+        2. Tries to find the time which was almost 1 sec (kept at 0.9 sec) prior to the current time
+        3. If such a time is found, then finds the average of all the x and y coordinates during
+        the last second and checks if the hand was actually stationary (checks if the distance in either x or y 
+        direction is less than 2.0 pixels). 
+        4. If the hand has not moved in the last second, then a new stroke is created
         """
         lb = bisect_left(timestamps, ct-1, lo=max(0,len(timestamps)-init_index_points_count), hi=len(timestamps))
         if ct - timestamps[lb] >= new_stroke_time_threshold:            
@@ -31,7 +32,7 @@ def createStrokes(index_points, cx, cy, ct):
             avg_y /= len(index_points[lb:])
             # print(avg_x, avg_y)
 
-            if(abs(avg_x - cx) < 2.0 or abs(avg_y - cy) < 2.0):
+            if(abs(avg_x - cx) < index_points_change_threshold or abs(avg_y - cy) < index_points_change_threshold):
                 ### Create new stroke
                 return True
     return False
@@ -95,8 +96,8 @@ if __name__ == '__main__':
                             
                             if stroke_count>0:
                                 strokes[stroke_count].append((cx, cy, ct))
-                                print(strokes)
-                                print("-"*20)
+                                # print(strokes)
+                                # print("-"*20)
                                 draw_points(index_points)
                             
                 mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
