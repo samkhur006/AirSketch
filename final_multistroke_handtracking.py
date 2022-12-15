@@ -104,8 +104,8 @@ class MultiStroke_HandTracking(object):
         :return bool : True if new stroke to be created else False
         """
         if len(index_points) > init_index_points_count:
-            lb = bisect_left(timestamps, ct-1, lo=max(0,len(timestamps)-init_index_points_count), hi=len(timestamps))
-            if len(index_points[lb:])!=0:
+            lb = bisect_left(timestamps, ct-1, lo = max(0,len(timestamps)-init_index_points_count), hi = len(timestamps))
+            if len(index_points[lb:]) != 0:
                 if ct - timestamps[lb] >= new_stroke_time_threshold:
                     avg_x = 0
                     avg_y = 0
@@ -128,8 +128,8 @@ if __name__ == '__main__':
     msht = MultiStroke_HandTracking()
 
     mpHands = mp.solutions.hands
-    hands = mpHands.Hands()
-    mpDraw = mp.solutions.drawing_utils
+    hands   = mpHands.Hands()
+    mpDraw  = mp.solutions.drawing_utils
 
     pTime = 0
     cTime = 0
@@ -137,10 +137,10 @@ if __name__ == '__main__':
     init_time = time.time()
 
     index_points = []
-    timestamps = []
-    strokes = dict()
+    timestamps   = []
+    strokes      = dict()
 
-    stroke_count = 0
+    stroke_count   = 0
     hand_init_flag = False
 
     hand_init_time = float()
@@ -154,7 +154,7 @@ if __name__ == '__main__':
             success, img = cap.read()
             img = cv2.flip(img, 1)
 
-            imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            imgRGB  = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             h, w, c = img.shape
 
             results = hands.process(imgRGB)
@@ -167,16 +167,16 @@ if __name__ == '__main__':
 
                 x = [0] * 21
                 y = [0] * 21
-                enter=False
+                enter = False
 
                 for handLms in results.multi_hand_landmarks:
                     for i, lm in enumerate(handLms.landmark):
-                        enter = True
+                        enter  = True
                         cx, cy = int(lm.x * w), int(lm.y * h)
-                        x[i]=cx
-                        y[i]=cy
+                        x[i]   = cx
+                        y[i]   = cy
 
-                        if i==8:
+                        if i == 8:
                             ct = time.time()-hand_init_time
                             print(cx, cy, ct)
 
@@ -193,7 +193,7 @@ if __name__ == '__main__':
                                         print("stroke_count:", stroke_count)
                                     strokes[stroke_count] = []
                                 
-                                if stroke_count>0:
+                                if stroke_count > 0:
                                     strokes[stroke_count].append((cx, cy, ct))
                                     # print(strokes)
                                     # print("-"*20)
@@ -204,22 +204,22 @@ if __name__ == '__main__':
                 # print("strokes:", strokes)
 
                 if len(queue) == 30:
-                    if queue[0]==True:
-                        count=count-1
+                    if queue[0] == True:
+                        count = count-1
                     queue.popleft()
 
-                if enter==True and msht.erase_check(x,y)==True:
+                if enter == True and msht.erase_check(x,y) == True:
                     queue.append(True)
-                    count=count+1
+                    count = count+1
                 else:
                     queue.append(False)
-                if count>=25:
-                    index_points=[]
+                if count >= 25:
+                    index_points = []
                     print("BREAKING")
                     break
 
             else:
-                if len(strokes)!=0:
+                if len(strokes) != 0:
                     print("Hand is out of drawing area!!!")            
                 msht.draw_points(index_points)
 
