@@ -96,7 +96,7 @@ if __name__ == '__main__':
                             
                             if stroke_count>0:
                                 strokes[stroke_count].append((cx, cy, ct))
-                                # print(strokes)
+                                print(strokes)
                                 # print("-"*20)
                                 draw_points(index_points)
                             

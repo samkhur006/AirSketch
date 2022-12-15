@@ -6,6 +6,7 @@ import numpy as np
 
 from collections import deque
 
+
 cap = cv2.VideoCapture(0)
 
 mpHands = mp.solutions.hands
@@ -55,76 +56,3 @@ def check(x,y):
     if (abs(arr[2] - arr[0]) > 0.21):
         return False
     return True
-
-while True:
-    count = 0
-    queue = deque([])
-    while True:
-        success, img = cap.read()
-        img = cv2.flip(img, 1)
-
-        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        h, w, c = img.shape
-
-        results = hands.process(imgRGB)
-
-        if results.multi_hand_landmarks:
-
-            if hand_init_flag == False:
-                hand_init_time = time.time()
-                hand_init_flag = True
-
-            # print(type(results.multi_hand_landmarks))
-            x = [0] * 21
-            y = [0] * 21
-            enter=False
-            for handLms in results.multi_hand_landmarks:
-
-                #print(len(handLms))
-                for i, lm in enumerate(handLms.landmark):
-                    #print(i, lm)
-                    enter=True
-                    cx, cy = int(lm.x * w), int(lm.y * h)
-                    x[i]=cx
-                    y[i]=cy
-
-                    if i == 8:
-                        ct = time.time() - hand_init_time
-                        print(cx, cy, ct)
-
-                        if len(queue)==30:
-                            print("This will be counted...")
-
-                            index_points.append((cx, cy))
-                            for index, item in enumerate(index_points):
-                                if index == len(index_points) - 1:
-                                    break
-                                cv2.line(img, item, index_points[index + 1], [255, 0, 0], 2)
-
-                mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
-
-            if len(queue) == 30:
-                if queue[0]==True:
-                    count=count-1
-                queue.popleft()
-
-            if enter==True and check(x,y)==True:
-                queue.append(True)
-                count=count+1
-            else:
-                queue.append(False)
-            if count>=5:
-                index_points=[]
-                print("BREAKING")
-                break
-
-        cTime = time.time()
-        fps   = 1 / (cTime-pTime)
-        pTime = cTime
-        cv2.putText(img, str(int(fps)), (10, 70), cv2.FONT_HERSHEY_COMPLEX, 3, (255, 0, 255))
-
-        # print(i, img)
-        cv2.imshow("Image", img)
-        cv2.waitKey(1)
-
-print("count is ",count)
