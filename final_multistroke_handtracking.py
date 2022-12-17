@@ -6,7 +6,7 @@ from bisect import *
 from config import *
 import numpy as np
 from collections import deque
-from keras.models import load_model
+# from keras.models import load_model
 import pandas as pd
 import matplotlib.pyplot as plt
 from Feature_extractor import Rubine_feature_extractor
@@ -216,18 +216,18 @@ if __name__ == '__main__':
                                     # print("Time {}".format(len(timestamps)))
                                     """
                                     Rubine feature extraction from x, y coordinates:
+                                    """
                                     msht.draw_points(index_points)
                                     df = pd.DataFrame(columns=["x", "y"])
                                     df["x"], df["y"] = zip(*index_points)
                                     feature_extractor = Rubine_feature_extractor(df)
                                     feature_df = feature_extractor.all_features(df)
                                     # print(feature_df)
-                                    pred = msht.classify(pd.DataFrame([feature_df]))
+                                    final_df = pd.DataFrame([feature_df])
+                                    pred = msht.classify(final_df.fillna(0))
                                     cv2.putText(img, str(pred), (100, 500), cv2.FONT_HERSHEY_COMPLEX, 3,
                                                 (255, 0, 255))
                                     print(pred)
-                                    # print(df)
-                                    """
                                     msht.draw_points(index_points)
                                     # image = np.zeros((720, 1280))
                                     # image[index_points[:,0], index_points[:,1]] = 1

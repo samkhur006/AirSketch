@@ -112,6 +112,8 @@ class Rubine_feature_extractor(object):
 
 
     def all_features(self, df):
+        df = (df-df.mean())/df.std()
         df_out = {"f01": self.f01(df), "f02": self.f02(df), "f03": self.f03(df), "f04": self.f04(df), "f05": self.f05(df), "f06": self.f06(df),
                   "f07": self.f07(df), "f08": self.f08(df), "f09": self.f09(df), "f10": self.f10(df), "f11": self.f11(df)}
+
         return df_out
