@@ -6,7 +6,11 @@ from bisect import *
 from config import *
 import numpy as np
 from collections import deque
-
+from keras.models import load_model
+import pandas as pd
+import matplotlib.pyplot as plt
+from Feature_extractor import Rubine_feature_extractor
+import pickle
 
 class MultiStroke_HandTracking(object):
     """
@@ -97,9 +101,9 @@ class MultiStroke_HandTracking(object):
         4. If the hand has not moved in the last second, then a new stroke is created
 
         :param List[List[int]] index_points: Coordinate points captured
-        :param int cx :
-        :param int cy :
-        :param int ct :
+        :param int cx : current x-coordinate
+        :param int cy : current y-coordinate
+        :param int ct : current timestamp
 
         :return bool : True if new stroke to be created else False
         """
@@ -116,12 +120,18 @@ class MultiStroke_HandTracking(object):
                     avg_y /= len(index_points[lb:])
                     # print(avg_x, avg_y)
 
-                    if(abs(avg_x - cx) < index_points_change_threshold or abs(avg_y - cy) < index_points_change_threshold):
+                    if abs(avg_x - cx) < index_points_change_threshold or abs(avg_y - cy) < index_points_change_threshold:
                         """
                         Create new stroke                       
                         """
                         return True
         return False
+
+    def classify(self, df, path="models/RandomForest.sav"):
+        model = pickle.load(open(path, 'rb'))
+        pred  = model.predict(df)
+
+        return pred
 
 if __name__ == '__main__':
     cap  = cv2.VideoCapture(0)
@@ -145,6 +155,10 @@ if __name__ == '__main__':
 
     hand_init_time = float()
 
+    # cnn_model = load_model('models/emnist_cnn_model.h5')
+    # letters = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i', 10: 'j',
+    #            11: 'k', 12: 'l', 13: 'm', 14: 'n', 15: 'o', 16: 'p', 17: 'q', 18: 'r', 19: 's', 20: 't',
+    #            21: 'u', 22: 'v', 23: 'w', 24: 'x', 25: 'y', 26: 'z', 27: '-'}
     while True:
         count = 0
         queue = deque([])
@@ -156,6 +170,7 @@ if __name__ == '__main__':
 
             imgRGB  = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             h, w, c = img.shape
+            print("Dimensions !! {} {} {}".format(h, w, c))
 
             results = hands.process(imgRGB)
 
@@ -187,7 +202,7 @@ if __name__ == '__main__':
                                 if msht.createStrokes(index_points, cx, cy, ct):
                                     stroke_count += 1
                                     print("stroke_count:", stroke_count)
-                                    if stroke_count>1 and len(strokes[stroke_count-1])==1:
+                                    if stroke_count > 1 and len(strokes[stroke_count-1]) == 1:
                                         stroke_count -= 1
                                         print("Removed the last stroke as the last stroke had only one point")
                                         print("stroke_count:", stroke_count)
@@ -197,7 +212,38 @@ if __name__ == '__main__':
                                     strokes[stroke_count].append((cx, cy, ct))
                                     # print(strokes)
                                     # print("-"*20)
+                                    # print("Index points {} {}".format(len(index_points), len(index_points[0])))
+                                    # print("Time {}".format(len(timestamps)))
+                                    """
+                                    Rubine feature extraction from x, y coordinates:
                                     msht.draw_points(index_points)
+                                    df = pd.DataFrame(columns=["x", "y"])
+                                    df["x"], df["y"] = zip(*index_points)
+                                    feature_extractor = Rubine_feature_extractor(df)
+                                    feature_df = feature_extractor.all_features(df)
+                                    # print(feature_df)
+                                    pred = msht.classify(pd.DataFrame([feature_df]))
+                                    cv2.putText(img, str(pred), (100, 500), cv2.FONT_HERSHEY_COMPLEX, 3,
+                                                (255, 0, 255))
+                                    print(pred)
+                                    # print(df)
+                                    """
+                                    msht.draw_points(index_points)
+                                    # image = np.zeros((720, 1280))
+                                    # image[index_points[:,0], index_points[:,1]] = 1
+                                    # newImage = cv2.resize(image, (28, 28))
+                                    # newImage = np.array(newImage)
+                                    # newImage = newImage.astype('float32')/255
+
+                                    # prediction1 = mlp_model.predict(newImage.reshape(1,28,28))[0]
+                                    # prediction1 = np.argmax(prediction1)
+
+                                    # prediction2 = cnn_model.predict(newImage.reshape(1,28,28,1))[0]
+                                    # prediction2 = np.argmax(prediction2)
+
+                                    # cv2.putText(img, "Convolution Neural Network:  " + str(letters[int(prediction2) + 1]), (100, 500),
+                                    #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+                                    # print(prediction2)
                                 
                     mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
                 # print("index_points:", index_points)
