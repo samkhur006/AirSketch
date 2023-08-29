@@ -23,3 +23,4 @@ python-dateutil==2.8.2
 six==1.16.0
 wincertstore==0.2
 `
+Please note that this is the first draft of AirSketch tool. The recently updated and resilient tool has been duly licensed to the Sketch Recognition Lab (SRL) at Texas A&M University.
