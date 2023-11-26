@@ -1,5 +1,8 @@
 # AirSketch
 
+
+![](hand.gif)
+
 Please note that this is the first draft of AirSketch tool. This tool tries to capture multiple strokes drawn by the index fingertip movement from a webcam without any extra device being used.
 It traces and predicts the object drawn. Please install the following dependencies to get started -
 `
